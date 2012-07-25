@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Multi Router</title>
+
+<script data-main="js/default.js" src="js/require-jquery-backbone.min.js"></script>
+<link rel="style.css" />
+
+</head>
+
+<body>
+
+	<nav>
+		<P><a href="#">home</a></p>
+		<P>
+			<details>
+				<summary> <a href="#videos/">videos</a> </summary>
+				<P><a href="#videos/details">video details</a></p>
+				<P><a href="#videos/details/12">video details number</a></p>
+			</details>
+		</p>
+	</nav>
+
+	<section title="Videos">
+		<h3>This is the videos section</h3>
+	</section>
+	
+	<section title="About">
+		<p>We are awesome</p>
+	</section>
+	
+	<section title="Home">
+		<h1>NOW YOU KNOW!!!</h1>
+	</section>
+
+	<script>
+	
+	require(['jquery', 'Videos', 'subroute'], function ($, Videos, subroute) {
+		
+		/*
+		//Videos
+		var videoApp = new Videos({	
+			el : $('SECTION[title="Videos"]')
+		});
+		*/
+		
+		
+		//and now initialze the videos app
+		var videosApp = new Videos({
+			el : 'section[title="Videos"]',
+		});
+		
+		
+		//Main App
+		var App = Backbone.View.extend({
+			el : 'body',
+			
+			initialize : function () {
+				_.bindAll(this, 'render');
+				
+				//set up the different...slides..
+				this.sections = this.$el.find('>SECTION');//.hide();
+				this.activeIndex = 1;
+				
+				
+				var 
+				self = this,
+				Router = Backbone.Router.extend({
+					routes : {
+						'' : 'home',
+						'videos*subroute' : 'videos',
+					},
+					
+					home : function () {
+						self.activeIndex = 1;
+						self.render();
+					},
+					videos : function (fragment) {
+						self.activeIndex = 0;
+						self.render();
+						
+						if (!self.videoRouter) {
+							self.videoRouter = subroute(videosApp.router, 'videos');
+						}
+						self.videoRouter.process(fragment);
+						//videosApp.router[ videosApp.router.routes[subroute] ]();
+					},
+					
+				});
+				var router = new Router();
+				
+			},
+			
+			render : function () {
+				var active = this.sections.eq(this.activeIndex).show()
+				this.sections.not(active).hide();
+			}
+		
+		});
+		new App();
+		
+		Backbone.history.start({ pushState:false });
+		//Backbone.history.navigate('videos/', true);
+		
+	});
+	
+	</script>
+	
+</body>
+
+</html>
